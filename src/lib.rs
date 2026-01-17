@@ -88,13 +88,15 @@ pub enum EvidenceSpec {
 /// A claim that some action was performed
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claim {
-    /// Unique identifier for this claim
+    /// Unique identifier for this claim (auto-generated if not provided)
+    #[serde(default = "Claim::default_id")]
     pub id: String,
 
     /// Human-readable description of what was claimed
     pub description: String,
 
-    /// When the claim was made
+    /// When the claim was made (defaults to now if not provided)
+    #[serde(default = "Utc::now")]
     pub timestamp: DateTime<Utc>,
 
     /// Evidence that should exist if the claim is true
@@ -115,6 +117,10 @@ impl Claim {
             evidence: Vec::new(),
             source: None,
         }
+    }
+
+    fn default_id() -> String {
+        Self::generate_id("unnamed-claim")
     }
 
     pub fn with_evidence(mut self, evidence: EvidenceSpec) -> Self {
