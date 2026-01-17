@@ -13,6 +13,13 @@
 //! - **Evidence**: Observable artifacts that should exist if the claim is true
 //! - **Verification**: The process of checking evidence against claims
 //! - **Verdict**: The outcome of verification (Confirmed, Refuted, Inconclusive)
+//!
+//! ## Features
+//!
+//! - `async` - Enable async verification for network-based evidence checks (HTTP, TCP)
+
+#[cfg(feature = "async")]
+pub mod async_checks;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
