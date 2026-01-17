@@ -17,11 +17,17 @@ thiserror = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 sha2 = "0.10"
 hex = "0.4"
+regex = "1.0"
 
 # Optional async support for network checks
 [features]
 default = []
 async = ["tokio", "reqwest"]
+watch = ["notify"]
+
+[dependencies.notify]
+version = "7.0"
+optional = true
 
 [dependencies.tokio]
 version = "1.0"
@@ -36,6 +42,7 @@ optional = true
 [dev-dependencies]
 proptest = "1.0"
 tempfile = "3.0"
+criterion = { version = "0.5", features = ["html_reports"] }
 
 [[bin]]
 name = "dyadt"
@@ -44,3 +51,7 @@ path = "src/main.rs"
 [lib]
 name = "did_you_actually_do_that"
 path = "src/lib.rs"
+
+[[bench]]
+name = "verification"
+harness = false

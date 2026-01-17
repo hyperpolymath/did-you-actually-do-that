@@ -16,7 +16,10 @@ fn cli_verify_existing_file() {
         .output()
         .expect("Failed to run dyadt");
 
-    assert!(output.status.success(), "Expected exit code 0 for existing file");
+    assert!(
+        output.status.success(),
+        "Expected exit code 0 for existing file"
+    );
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Confirmed"), "Expected Confirmed in output");
 }
@@ -28,7 +31,11 @@ fn cli_verify_missing_file() {
         .output()
         .expect("Failed to run dyadt");
 
-    assert_eq!(output.status.code(), Some(1), "Expected exit code 1 for missing file");
+    assert_eq!(
+        output.status.code(),
+        Some(1),
+        "Expected exit code 1 for missing file"
+    );
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Refuted"), "Expected Refuted in output");
 }
@@ -61,7 +68,8 @@ fn cli_check_claim_file() {
 
     // Create a claim file
     let claim_file = dir.path().join("claim.json");
-    let claim_json = format!(r#"{{
+    let claim_json = format!(
+        r#"{{
         "description": "Test claim",
         "evidence": [
             {{ "type": "FileExists", "spec": {{ "path": "{}" }} }},
@@ -104,7 +112,11 @@ fn cli_check_failing_claim() {
         .output()
         .expect("Failed to run dyadt");
 
-    assert_eq!(output.status.code(), Some(1), "Expected exit code 1 for refuted claim");
+    assert_eq!(
+        output.status.code(),
+        Some(1),
+        "Expected exit code 1 for refuted claim"
+    );
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Refuted"));
 }
@@ -121,7 +133,8 @@ fn cli_report_multiple_claims() {
 
     // Create claims file with array
     let claims_file = dir.path().join("claims.json");
-    let claims_json = format!(r#"[
+    let claims_json = format!(
+        r#"[
         {{
             "description": "First claim",
             "evidence": [{{ "type": "FileExists", "spec": {{ "path": "{}" }} }}]
@@ -156,7 +169,8 @@ fn cli_report_mixed_results() {
     fs::write(&file1, "content").unwrap();
 
     let claims_file = dir.path().join("mixed.json");
-    let claims_json = format!(r#"[
+    let claims_json = format!(
+        r#"[
         {{
             "description": "This passes",
             "evidence": [{{ "type": "FileExists", "spec": {{ "path": "{}" }} }}]
@@ -175,7 +189,11 @@ fn cli_report_mixed_results() {
         .output()
         .expect("Failed to run dyadt");
 
-    assert_eq!(output.status.code(), Some(1), "Expected exit code 1 when any claim refuted");
+    assert_eq!(
+        output.status.code(),
+        Some(1),
+        "Expected exit code 1 when any claim refuted"
+    );
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Overall: Refuted"));
 }
@@ -205,7 +223,11 @@ fn cli_invalid_json_returns_error() {
         .output()
         .expect("Failed to run dyadt");
 
-    assert_eq!(output.status.code(), Some(3), "Expected exit code 3 for parse error");
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "Expected exit code 3 for parse error"
+    );
 }
 
 #[test]
@@ -215,7 +237,11 @@ fn cli_missing_file_returns_error() {
         .output()
         .expect("Failed to run dyadt");
 
-    assert_eq!(output.status.code(), Some(3), "Expected exit code 3 for missing file");
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "Expected exit code 3 for missing file"
+    );
 }
 
 #[test]

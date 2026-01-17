@@ -158,7 +158,11 @@ impl AsyncVerifier {
         }
     }
 
-    async fn check_http_reachable(&self, url: &str, timeout_secs: u64) -> (Verdict, Option<String>) {
+    async fn check_http_reachable(
+        &self,
+        url: &str,
+        timeout_secs: u64,
+    ) -> (Verdict, Option<String>) {
         let client = Client::builder()
             .timeout(Duration::from_secs(timeout_secs))
             .build();
@@ -230,10 +234,7 @@ impl AsyncVerifier {
                 } else {
                     (
                         Verdict::Refuted,
-                        Some(format!(
-                            "HTTP {} (expected {})",
-                            actual, expected_status
-                        )),
+                        Some(format!("HTTP {} (expected {})", actual, expected_status)),
                     )
                 }
             }
@@ -260,7 +261,10 @@ impl AsyncVerifier {
             Ok(resp) => match resp.text().await {
                 Ok(body) => {
                     if body.contains(substring) {
-                        (Verdict::Confirmed, Some("Substring found in response".to_string()))
+                        (
+                            Verdict::Confirmed,
+                            Some("Substring found in response".to_string()),
+                        )
                     } else {
                         (
                             Verdict::Refuted,
@@ -268,7 +272,10 @@ impl AsyncVerifier {
                         )
                     }
                 }
-                Err(e) => (Verdict::Refuted, Some(format!("Failed to read body: {}", e))),
+                Err(e) => (
+                    Verdict::Refuted,
+                    Some(format!("Failed to read body: {}", e)),
+                ),
             },
             Err(e) => (Verdict::Refuted, Some(format!("Request error: {}", e))),
         }
@@ -370,10 +377,7 @@ impl AsyncVerifier {
 
 /// Simple JSON path extraction
 /// Supports paths like ".field", ".nested.field", "[0]", ".array[0].field"
-fn extract_json_path<'a>(
-    json: &'a serde_json::Value,
-    path: &str,
-) -> Option<&'a serde_json::Value> {
+fn extract_json_path<'a>(json: &'a serde_json::Value, path: &str) -> Option<&'a serde_json::Value> {
     let mut current = json;
 
     for segment in path.split('.').filter(|s| !s.is_empty()) {
@@ -408,8 +412,14 @@ mod tests {
             "value": 42
         });
 
-        assert_eq!(extract_json_path(&json, ".name"), Some(&serde_json::json!("test")));
-        assert_eq!(extract_json_path(&json, ".value"), Some(&serde_json::json!(42)));
+        assert_eq!(
+            extract_json_path(&json, ".name"),
+            Some(&serde_json::json!("test"))
+        );
+        assert_eq!(
+            extract_json_path(&json, ".value"),
+            Some(&serde_json::json!(42))
+        );
         assert_eq!(extract_json_path(&json, ".missing"), None);
     }
 

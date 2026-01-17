@@ -23,14 +23,10 @@ fn arb_path() -> impl Strategy<Value = String> {
 fn arb_evidence_spec() -> impl Strategy<Value = EvidenceSpec> {
     prop_oneof![
         arb_path().prop_map(|path| EvidenceSpec::FileExists { path }),
-        (arb_path(), "[a-f0-9]{64}").prop_map(|(path, sha256)| EvidenceSpec::FileWithHash {
-            path,
-            sha256
-        }),
-        (arb_path(), ".*{1,50}").prop_map(|(path, substring)| EvidenceSpec::FileContains {
-            path,
-            substring
-        }),
+        (arb_path(), "[a-f0-9]{64}")
+            .prop_map(|(path, sha256)| EvidenceSpec::FileWithHash { path, sha256 }),
+        (arb_path(), ".*{1,50}")
+            .prop_map(|(path, substring)| EvidenceSpec::FileContains { path, substring }),
         arb_path().prop_map(|path| EvidenceSpec::DirectoryExists { path }),
     ]
 }
@@ -118,7 +114,6 @@ proptest! {
 mod deterministic_tests {
     use super::*;
     use std::fs;
-    use std::io::Write;
     use tempfile::tempdir;
 
     #[test]
@@ -127,10 +122,9 @@ mod deterministic_tests {
         let file_path = dir.path().join("test.txt");
         fs::write(&file_path, "content").unwrap();
 
-        let claim = Claim::new("File should exist")
-            .with_evidence(EvidenceSpec::FileExists {
-                path: file_path.to_string_lossy().to_string(),
-            });
+        let claim = Claim::new("File should exist").with_evidence(EvidenceSpec::FileExists {
+            path: file_path.to_string_lossy().to_string(),
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -140,10 +134,9 @@ mod deterministic_tests {
 
     #[test]
     fn file_exists_refuted_when_file_missing() {
-        let claim = Claim::new("File should exist")
-            .with_evidence(EvidenceSpec::FileExists {
-                path: "/nonexistent/path/file.txt".to_string(),
-            });
+        let claim = Claim::new("File should exist").with_evidence(EvidenceSpec::FileExists {
+            path: "/nonexistent/path/file.txt".to_string(),
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -157,11 +150,10 @@ mod deterministic_tests {
         let file_path = dir.path().join("test.txt");
         fs::write(&file_path, "hello world").unwrap();
 
-        let claim = Claim::new("File contains hello")
-            .with_evidence(EvidenceSpec::FileContains {
-                path: file_path.to_string_lossy().to_string(),
-                substring: "hello".to_string(),
-            });
+        let claim = Claim::new("File contains hello").with_evidence(EvidenceSpec::FileContains {
+            path: file_path.to_string_lossy().to_string(),
+            substring: "hello".to_string(),
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -175,11 +167,10 @@ mod deterministic_tests {
         let file_path = dir.path().join("test.txt");
         fs::write(&file_path, "hello world").unwrap();
 
-        let claim = Claim::new("File contains goodbye")
-            .with_evidence(EvidenceSpec::FileContains {
-                path: file_path.to_string_lossy().to_string(),
-                substring: "goodbye".to_string(),
-            });
+        let claim = Claim::new("File contains goodbye").with_evidence(EvidenceSpec::FileContains {
+            path: file_path.to_string_lossy().to_string(),
+            substring: "goodbye".to_string(),
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -196,11 +187,10 @@ mod deterministic_tests {
         // SHA-256 of "test content"
         let expected_hash = "6ae8a75555209fd6c44157c0aed8016e763ff435a19cf186f76863140143ff72";
 
-        let claim = Claim::new("File has correct hash")
-            .with_evidence(EvidenceSpec::FileWithHash {
-                path: file_path.to_string_lossy().to_string(),
-                sha256: expected_hash.to_string(),
-            });
+        let claim = Claim::new("File has correct hash").with_evidence(EvidenceSpec::FileWithHash {
+            path: file_path.to_string_lossy().to_string(),
+            sha256: expected_hash.to_string(),
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -212,10 +202,9 @@ mod deterministic_tests {
     fn directory_exists_confirmed() {
         let dir = tempdir().unwrap();
 
-        let claim = Claim::new("Directory exists")
-            .with_evidence(EvidenceSpec::DirectoryExists {
-                path: dir.path().to_string_lossy().to_string(),
-            });
+        let claim = Claim::new("Directory exists").with_evidence(EvidenceSpec::DirectoryExists {
+            path: dir.path().to_string_lossy().to_string(),
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -271,11 +260,10 @@ mod deterministic_tests {
 
     #[test]
     fn command_succeeds_with_true() {
-        let claim = Claim::new("True succeeds")
-            .with_evidence(EvidenceSpec::CommandSucceeds {
-                command: "true".to_string(),
-                args: vec![],
-            });
+        let claim = Claim::new("True succeeds").with_evidence(EvidenceSpec::CommandSucceeds {
+            command: "true".to_string(),
+            args: vec![],
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -285,11 +273,10 @@ mod deterministic_tests {
 
     #[test]
     fn command_fails_with_false() {
-        let claim = Claim::new("False fails")
-            .with_evidence(EvidenceSpec::CommandSucceeds {
-                command: "false".to_string(),
-                args: vec![],
-            });
+        let claim = Claim::new("False fails").with_evidence(EvidenceSpec::CommandSucceeds {
+            command: "false".to_string(),
+            args: vec![],
+        });
 
         let verifier = Verifier::new();
         let report = verifier.verify(&claim);
@@ -304,11 +291,10 @@ mod deterministic_tests {
         let mut verifier = Verifier::new();
         verifier.register_checker("always_pass", |_params| Ok(Verdict::Confirmed));
 
-        let claim = Claim::new("Custom check")
-            .with_evidence(EvidenceSpec::Custom {
-                name: "always_pass".to_string(),
-                params: HashMap::new(),
-            });
+        let claim = Claim::new("Custom check").with_evidence(EvidenceSpec::Custom {
+            name: "always_pass".to_string(),
+            params: HashMap::new(),
+        });
 
         let report = verifier.verify(&claim);
 
@@ -321,11 +307,10 @@ mod deterministic_tests {
 
         let verifier = Verifier::new();
 
-        let claim = Claim::new("Unknown checker")
-            .with_evidence(EvidenceSpec::Custom {
-                name: "nonexistent".to_string(),
-                params: HashMap::new(),
-            });
+        let claim = Claim::new("Unknown checker").with_evidence(EvidenceSpec::Custom {
+            name: "nonexistent".to_string(),
+            params: HashMap::new(),
+        });
 
         let report = verifier.verify(&claim);
 
