@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: MPL-2.0
+[package]
+name = "did-you-actually-do-that"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jonathan D.A. Jewell"]
+description = "A verification framework for validating claimed AI actions against actual outcomes"
+license = "MPL-2.0"
+repository = "https://gitlab.com/hyperpolymath/did-you-actually-do-that"
+keywords = ["verification", "ai", "accountability", "trust"]
+categories = ["development-tools", "command-line-utilities"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+hex = "0.4"
+
+[dev-dependencies]
+proptest = "1.0"
+
+[[bin]]
+name = "dyadt"
+path = "src/main.rs"
+
+[lib]
+name = "did_you_actually_do_that"
+path = "src/lib.rs"
