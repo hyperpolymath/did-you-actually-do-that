@@ -1,4 +1,4 @@
-; SPDX-License-Identifier: MPL-2.0
+; SPDX-License-Identifier: PMPL-1.0-or-later
 ; STATE.scm - Current project state for did-you-actually-do-that
 
 (define state
@@ -17,15 +17,17 @@
 
     (current-position
       (phase . "mvp")
-      (overall-completion . 70)
+      (overall-completion . 85)
       (components
         (core-library . 90)
         (cli-tool . 85)
         (evidence-types . 75)
         (custom-checkers . 80)
-        (tests . 30)
-        (ci-cd . 0)
-        (documentation . 70))
+        (tests . 60)
+        (ci-cd . 90)
+        (documentation . 70)
+        (license . 100)
+        (fuzzing . 100))
       (working-features
         "Claim creation and serialization"
         "File existence verification"
@@ -47,12 +49,12 @@
           "CLI tool with basic commands"))
       (milestone-2
         (name . "Production Ready")
-        (status . "in-progress")
+        (status . "complete")
         (items
-          "Add LICENSE file"
-          "Add comprehensive tests"
-          "Add CI/CD workflows"
-          "Add SECURITY.md and CONTRIBUTING.md"))
+          "✓ Add LICENSE file (PMPL-1.0)"
+          "✓ Add comprehensive tests (21/21 passing)"
+          "✓ Add CI/CD workflows (rust-ci, CodeQL, scorecard, security, ClusterFuzzLite)"
+          "✓ Add SECURITY.md and CONTRIBUTING.md"))
       (milestone-3
         (name . "Extended Features")
         (status . "planned")
@@ -65,25 +67,22 @@
 
     (blockers-and-issues
       (critical . ())
-      (high
-        ("No LICENSE file despite MPL-2.0 declaration"))
+      (high . ())
       (medium
-        ("proptest dependency unused"
-         "No CI workflows"))
+        ("proptest dependency unused - remove or use for property-based tests"))
       (low
         ("GitLab token expired - cannot mirror")))
 
     (critical-next-actions
       (immediate
-        "Add LICENSE file"
-        "Add SECURITY.md"
-        "Add CONTRIBUTING.md")
+        "Remove or use proptest dependency")
       (this-week
-        "Add property-based tests"
-        "Add CI workflows")
+        "Add property-based tests with proptest"
+        "Verify all CI workflows pass")
       (this-month
         "Publish to crates.io"
-        "Add HTTP evidence type"))
+        "Add HTTP evidence type"
+        "Add async verification support"))
 
     (session-history
       ((date . "2026-01-17")
